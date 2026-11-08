@@ -39,4 +39,45 @@ void main() {
   }
   f.writeAsStringSync(m);
   stdout.writeln('✓ AndroidManifest.xml ready (name GridNav, internet + GPS permissions).');
+  fixCompileSdk();
+}
+
+// Some plugins (e.g. file_picker) are compiled for an older Android version than their
+// helper libraries need, and the build stops with "requires ... compile against version 36".
+// This makes every library compile against Android 36. It only changes how the app is
+// built, not which phones can install it.
+const sdk = 36;
+void fixCompileSdk() {
+  const mark = '// GridNav: compile all plugins against one Android version';
+  final kts = File('android/build.gradle.kts');
+  final groovy = File('android/build.gradle');
+  if (kts.existsSync()) {
+    final s = kts.readAsStringSync();
+    if (s.contains(mark)) return;
+    kts.writeAsStringSync('''$mark
+subprojects {
+    val fix: (Project) -> Unit = { p ->
+        p.extensions.findByName("android")?.let { ext ->
+            ext.javaClass.getMethod("compileSdkVersion", Int::class.javaPrimitiveType).invoke(ext, $sdk)
+        }
+    }
+    if (state.executed) fix(this) else afterEvaluate { fix(this) }
+}
+
+$s''');
+  } else if (groovy.existsSync()) {
+    final s = groovy.readAsStringSync();
+    if (s.contains(mark)) return;
+    groovy.writeAsStringSync('''$mark
+subprojects { p ->
+    def fix = { q -> if (q.hasProperty('android')) q.android.compileSdkVersion $sdk }
+    if (p.state.executed) fix(p) else p.afterEvaluate { fix(p) }
+}
+
+$s''');
+  } else {
+    stderr.writeln('! android/build.gradle not found; skipped the compileSdk fix.');
+    return;
+  }
+  stdout.writeln('✓ All plugins compile against Android $sdk.');
 }
