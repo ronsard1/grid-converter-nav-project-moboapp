@@ -1,0 +1,41 @@
+name: gridnav
+description: GridNav — grid converter and navigation exercise planner (offline, data on the phone).
+publish_to: 'none'
+version: 1.2.1+4
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+  flutter: '>=3.24.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter: ^4.10.0     # shows the GridNav screens
+  printing: ^5.13.0            # Android print screen + "Save as PDF"
+  pdf: ^3.11.0                 # page sizes for printing
+  share_plus: ^10.1.0          # share backups (WhatsApp, email, Drive…)
+  path_provider: ^2.1.4        # temporary folder for shared files
+  file_picker: ^8.1.0          # choose where to save / which backup to restore
+  geolocator: ^13.0.1          # GPS "My position"
+  url_launcher: ^6.3.0         # open Google Maps links
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/www/
+    - assets/www/css/
+    - assets/www/js/
+    - assets/www/icons/
+    - assets/www/vendor/
+    - assets/www/vendor/leaflet/
+    - assets/www/vendor/leaflet/images/
+    - assets/www/vendor/fonts/
+
+# The newest "image" package (used by printing/pdf) needs a newer "archive" than
+# the one that gets installed, which breaks the build. Pin a version that works.
+dependency_overrides:
+  image: 4.5.4

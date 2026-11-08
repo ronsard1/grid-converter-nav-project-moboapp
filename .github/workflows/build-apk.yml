@@ -1,0 +1,73 @@
+# ------------------------------------------------------------------
+# GitHub builds the GridNav APK for you.
+# It runs every time you upload (push) changes, or when you press
+# "Run workflow" in the Actions tab. The APK appears on the Releases page.
+# ------------------------------------------------------------------
+name: Build Android APK
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:          # adds a "Run workflow" button
+
+permissions:
+  contents: write             # needed to publish the APK on the Releases page
+
+jobs:
+  build:
+    runs-on: ubuntu-latest    # a fresh Linux computer from GitHub, free for this
+    steps:
+      - name: 1. Get the project files
+        uses: actions/checkout@v4
+
+      - name: 2. Install Java (Android needs it)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: 3. Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: 4. Create the Android part
+        run: flutter create --platforms=android --org rw.gridnav --project-name gridnav .
+
+      - name: 5. Download packages
+        run: flutter pub get
+
+      - name: 6. Put map library and fonts inside the app
+        run: dart run tool/get_libs.dart
+
+      - name: 7. App name and GPS permission
+        run: dart run tool/setup_android.dart
+
+      - name: 9. Same signing key every time (so updates keep your data)
+        run: |
+          mkdir -p ~/.android
+          cp tool/ci/gridnav-test.keystore ~/.android/debug.keystore
+
+      - name: 10. Build the APK
+        run: flutter build apk --release --build-name=1.0.${{ github.run_number }} --build-number=${{ github.run_number }}
+
+      - name: 11. Give the APK a clear name
+        run: cp build/app/outputs/flutter-apk/app-release.apk "GridNav-1.0.${{ github.run_number }}.apk"
+
+      - name: 12. Keep a copy in this run (Artifacts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: GridNav-APK
+          path: GridNav-*.apk
+
+      - name: 13. Publish on the Releases page
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ github.run_number }}
+          name: GridNav 1.0.${{ github.run_number }}
+          body: |
+            Android app. On your phone: tap the .apk below to download, open it, allow "Install unknown apps", then Install.
+            Installing a newer version over the old one keeps your data.
+          files: GridNav-*.apk
+          make_latest: true
