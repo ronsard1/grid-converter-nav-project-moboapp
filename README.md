@@ -1,5 +1,8 @@
 # GridNav — Flutter app (Android APK)
 
+**Developed by ASRAT**
+
+
 Grid ↔ lat/lon converter (Rwanda national grid, UTM, Arc datums) and navigation exercise planner:
 routes per syndicate, route maps, leader summary, syndicate slips, control board.
 **Works with no internet. All data stays on the phone.**
