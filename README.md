@@ -33,10 +33,26 @@ Data: saved inside the app on the phone (no account, no Firebase).
 
 ## Two ways to get the APK
 
-- **GitHub builds it** (no tools needed): upload this folder to a GitHub repository. `.github/workflows/build-apk.yml` makes GitHub build the APK and put it on the repository's **Releases** page. Full guide: *GridNav: build the APK with GitHub, step by step*.
+- **GitHub builds it** (no tools needed): this project is already on GitHub. Every push to `main` makes GitHub build a new APK and put it on the **Releases** page: https://github.com/ronsard1/grid-converter-nav-project-moboapp/releases/latest. The instructions are in `.github/workflows/build-apk.yml`.
 - **Your computer builds it** (Flutter + emulator): the steps below.
 
 Both use the same signing key (`tool/ci/gridnav-test.keystore`) only when built on GitHub. Pick one way and stick to it, because an APK signed with a different key can't update the other.
+
+---
+
+## Hidden files: what they are and how to see them
+Names that start with a dot are "hidden" settings files. Keep them in the folder:
+
+| Name | What it does |
+|---|---|
+| `.github/workflows/build-apk.yml` | Tells GitHub how to build the APK |
+| `.gitignore` | Tells git which folders not to upload (`build`, `.dart_tool`, `android`, APK files) |
+
+How to see them:
+- **Windows 11 File Explorer:** **View** (top bar) → **Show** → tick **Hidden items**. If **View** isn't visible, press **⋯** (See more) or make the window wider.
+- **Windows 10 File Explorer:** **View** tab (top ribbon) → tick **Hidden items**.
+- **VS Code:** *File → Open Folder*; the Explorer on the left shows them.
+- **On GitHub:** they're listed at the top of the repository page.
 
 ---
 
